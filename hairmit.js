@@ -34,22 +34,26 @@ Render.run(render);
 var runner = Runner.create();
 Runner.run(runner, engine);
 
-// add bodies
-var group = Body.nextGroup(true),
-    length = 50,
-    width = 15,
-    segmentsPerHair = 10,
-    hairAngularStiffness = 0.7,
-    hairStiffness = 0.7;
+var GROUP = Body.nextGroup(true);
 
+
+// TODO where to put this
 world.gravity.scale = 0.01;
 
 function oneHair(start, hairOpts) {
-  hairOpts = hairOpts || {};
+  var opts = {
+    length: 50,
+    width: 15,
+    angle: Math.PI,
+    segmentsPerHair: 10,
+    angularStiffness: 0.9,
+    stiffness: 0.7
+  };
+  Object.assign(opts, hairOpts);
   // make actual hair bodies
-  var strand = Composites.stack(start.x, start.y, segmentsPerHair, 1, -20, 0, function(x, y) {
-    return Bodies.rectangle(x, y, length, width, {
-      collisionFilter: { group: group },
+  var strand = Composites.stack(start.x, start.y, opts.segmentsPerHair, 1, -20, 0, function(x, y) {
+    return Bodies.rectangle(x, y, opts.length, opts.width, {
+      collisionFilter: { group: GROUP },
       frictionAir: 0,
       chamfer: 5,
       render: {
@@ -61,17 +65,17 @@ function oneHair(start, hairOpts) {
   });
   // attach segments to each other
   Composites.chain(strand, 0.45, 0, -0.45, 0, {
-    stiffness: 0.9,
+    stiffness: 0.99,
     length: 0,
-    angularStiffness: hairAngularStiffness,
+    angularStiffness: opts.angularStiffness,
     render: {
       strokeStyle: '#4a485b'
     }
   });
   // make them tense
   Composites.chain(strand, 0, 0, 0, 0, {
-    stiffness: hairStiffness,
-    length: length,
+    stiffness: opts.stiffness,
+    length: opts.length,
     render: {
       strokeStyle: '#4a485b'
     }
@@ -80,7 +84,7 @@ function oneHair(start, hairOpts) {
   var firstSegment = strand.bodies[0];
   var startPoint = {x: firstSegment.position.x,
                     y: firstSegment.position.y};
-  fix(strand, firstSegment, Math.PI/3, length/2);
+  fix(strand, firstSegment, opts.angle, opts.length/2);
   return strand;
 }
 
