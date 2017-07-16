@@ -158,18 +158,22 @@ var mouseConstraint = MouseConstraint.create(engine, {
   }
 });
 
+function makeCuttable(hair) {
+  Events.on(
+    mouseConstraint, "mousedown",
+    ({source: {body}}) => {
+      if (body && hair.bodies.includes(body)) {
+        World.remove(hair, [body], true);
+        removeAllConstraints(hair, body);
+      }
+    });
+}
+
+hairs.composites.forEach(makeCuttable);
 
 // TODO everything in the world is cuttable right now
 // this is fine because for now there is only hair
 // refactor this if we ever add anything else
-Events.on(mouseConstraint, "mousedown",
-          ({source: {body}}) => {
-            console.log(body);
-            if (body) {
-              World.remove(body.parent, [body], true);
-              removeAllConstraints(body.parnet, body);
-            }
-          });
 
 function removeAllConstraints(parent, body) {
   var toDelete = parent.constraints.filter((c) => (c.bodyA === body) || (c.bodyB === body));
