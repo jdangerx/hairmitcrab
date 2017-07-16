@@ -24,7 +24,7 @@ var render = Render.create({
     width: 800,
     height: 600,
     wireframes: false,
-    background: '#0f0f13'
+    background: '#9999cc'
   }
 });
 
@@ -55,7 +55,7 @@ function oneHair(start, hairOpts) {
     segmentsPerHair: 10,
     angularStiffness: 0.95,
     stiffness: 0.2,
-    kinkiness: 0.2,
+    kinkiness: 0.3,
     overlap: 0.4,
   };
   Object.assign(opts, hairOpts);
@@ -72,9 +72,8 @@ function oneHair(start, hairOpts) {
       frictionAir: 0.1,
       chamfer: 5,
       render: {
-        fillStyle: 'transparent',
-        lineWidth: 1,
-        strokeStyle: '#41485b'
+        fillStyle: 'pink',
+        lineWidth: 0
       }
     })
   );
@@ -93,7 +92,7 @@ function oneHair(start, hairOpts) {
     stiffness: 1,
     angularStiffness: opts.angularStiffness,
     render: {
-      strokeStyle: '#4a485b'
+      visible: false
     }
   });
   // make them tense
@@ -104,7 +103,7 @@ function oneHair(start, hairOpts) {
     damping: 0.05,
     anchor: false,
     render: {
-      strokeStyle: '#4a485b'
+      visible: false
     }
   });
   // fix the first one
@@ -132,7 +131,7 @@ function fix(parent, body, pinAngle, pinDist) {
     stiffness: 1,
     length: 0,
     render: {
-      strokeStyle: '#4a485b'
+      visible: false
     }
   }));
 
@@ -145,7 +144,7 @@ function fix(parent, body, pinAngle, pinDist) {
     stiffness: 1,
     length: 0,
     render: {
-      strokeStyle: '#4a485b'
+      visible: false
     }
   }));
 }
@@ -153,7 +152,7 @@ function fix(parent, body, pinAngle, pinDist) {
 // main
 
 var follicles = [];
-var n_hairs = 30;
+var n_hairs = 24;
 for (var i = 0; i < n_hairs; i++) {
   follicles.push(
     {
