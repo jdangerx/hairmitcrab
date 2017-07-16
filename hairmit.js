@@ -40,97 +40,113 @@ var group = Body.nextGroup(true),
     width = 15,
     segmentsPerHair = 10,
     hairAngularStiffness = 0.7,
-    hairStiffness = 0.3;
-
-var pendulum = Composites.stack(350, 160, segmentsPerHair, 1, -20, 0, function(x, y) {
-  return Bodies.rectangle(x, y, length, width, {
-    collisionFilter: { group: group },
-    frictionAir: 0,
-    chamfer: 5,
-    render: {
-      fillStyle: 'transparent',
-      lineWidth: 1,
-      strokeStyle: '#41485b',
-    }
-  });
-});
+    hairStiffness = 0.7;
 
 world.gravity.scale = 0.01;
 
-Composites.chain(pendulum, 0.45, 0, -0.45, 0, {
-  stiffness: 0.9, 
-  length: 0,
-  angularStiffness: hairAngularStiffness,
-  render: {
-    strokeStyle: '#4a485b'
-  }
-});
-
-Composites.chain(pendulum, 0, 0, 0, 0, { 
-  stiffness: hairStiffness,
-  length: length,
-  render: {
-    strokeStyle: '#4a485b'
-  }
-});
-
-Composite.add(pendulum, Constraint.create({
-  bodyB: pendulum.bodies[0],
-  pointB: { x: -length * 0.42, y: 0 },
-  pointA: { x: pendulum.bodies[0].position.x - length * 0.42, y: pendulum.bodies[0].position.y },
-  stiffness: 1,
-  length: 0,
-  angularStiffness: 1,
-  render: {
-    strokeStyle: '#4a485b'
-  }
-}));
-
-Composite.add(pendulum, Constraint.create({
-  bodyB: pendulum.bodies[0],
-  pointB: { x: length * 0.42, y: 0 },
-  pointA: { x: pendulum.bodies[0].position.x - length * 0.42, y: pendulum.bodies[0].position.y + width},
-  stiffness: 1,
-  length: length * 0.8,
-  render: {
-    strokeStyle: '#4a485b'
-  }
-}));
-
-var upperArm = pendulum.bodies[0];
-var lowerArm = pendulum.bodies[1];
-
-Body.rotate(upperArm, -Math.PI * 0.3, {
-  x: upperArm.position.x - 100,
-  y: upperArm.position.y
-});
-
-Body.rotate(lowerArm, -Math.PI * 0.3, {
-  x: lowerArm.position.x - 100,
-  y: lowerArm.position.y
-});
-
-World.add(world, pendulum);
-
-// add mouse control
-var mouse = Mouse.create(render.canvas),
-    mouseConstraint = MouseConstraint.create(engine, {
-      mouse: mouse,
-      constraint: {
-        stiffness: 0.2,
-        render: {
-          visible: false
-        }
+function oneHair(start, hairOpts) {
+  hairOpts = hairOpts || {};
+  // make actual hair bodies
+  var strand = Composites.stack(start.x, start.y, segmentsPerHair, 1, -20, 0, function(x, y) {
+    return Bodies.rectangle(x, y, length, width, {
+      collisionFilter: { group: group },
+      frictionAir: 0,
+      chamfer: 5,
+      render: {
+        fillStyle: 'transparent',
+        lineWidth: 1,
+        strokeStyle: '#41485b',
       }
     });
+  });
+  // attach segments to each other
+  Composites.chain(strand, 0.45, 0, -0.45, 0, {
+    stiffness: 0.9,
+    length: 0,
+    angularStiffness: hairAngularStiffness,
+    render: {
+      strokeStyle: '#4a485b'
+    }
+  });
+  // make them tense
+  Composites.chain(strand, 0, 0, 0, 0, {
+    stiffness: hairStiffness,
+    length: length,
+    render: {
+      strokeStyle: '#4a485b'
+    }
+  });
+  // fix the first one
+  var firstSegment = strand.bodies[0];
+  var startPoint = {x: firstSegment.position.x,
+                    y: firstSegment.position.y};
+  fix(strand, firstSegment, Math.PI/3, length/2);
+  return strand;
+}
 
-Events.on(mouseConstraint, "mousedown",
-          ({source: {body}}) => {
-            if (body) {
-              World.remove(pendulum, [body], true);
-              removeAllConstraints(pendulum, body);
-            }
-          });
+function project(point, angle, length){
+  return {
+    x: point.x + length * Math.cos(angle),
+    y: point.y + length * Math.sin(angle)
+  };
+}
+
+
+function fix(parent, body, pinAngle, pinDist) {
+
+  Composite.add(parent, Constraint.create({
+    bodyB: body,
+    pointB: { x: 0, y: 0 },
+    pointA: {x: body.position.x, y: body.position.y},
+    stiffness: 1,
+    length: 0,
+    render: {
+      strokeStyle: '#4a485b'
+    }
+  }));
+
+  var pin = project(body.position, pinAngle, pinDist);
+
+  Composite.add(parent, Constraint.create({
+    bodyB: body,
+    pointB: { x: -pinDist, y: 0 },
+    pointA: pin,
+    stiffness: 1,
+    length: 0,
+    render: {
+      strokeStyle: '#4a485b'
+    }
+  }));
+}
+
+
+var start = {x: 350, y: 160};
+
+var strand = oneHair(start);
+World.add(world, strand);
+
+
+
+// add mouse control
+var mouse = Mouse.create(render.canvas);
+
+var mouseConstraint = MouseConstraint.create(engine, {
+  mouse: mouse,
+  constraint: {
+    stiffness: 0.2,
+    render: {
+      visible: false
+    }
+  }
+});
+
+// Events.on(mouseConstraint, "mousedown",
+//           ({source: {body}}) => {
+//             if (body) {
+//               World.remove(strand, [body], true);
+//               removeAllConstraints(strand, body);
+//             }
+//           });
 
 function removeAllConstraints(parent, body) {
   var toDelete = parent.constraints.filter((c) => (c.bodyA === body) || (c.bodyB === body));
