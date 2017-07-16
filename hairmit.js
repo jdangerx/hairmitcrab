@@ -54,8 +54,8 @@ function oneHair(start, hairOpts) {
     angle: Math.PI,
     segmentsPerHair: 10,
     angularStiffness: 0.95,
-    stiffness: 0.6,
-    kinkiness: 0.0,
+    stiffness: 0.2,
+    kinkiness: 0.2,
     overlap: 0.4,
   };
   Object.assign(opts, hairOpts);
@@ -85,13 +85,12 @@ function oneHair(start, hairOpts) {
   strand
     .constraints
     .filter(({label}) => label === "pin")
-    .forEach((pin, i) => pin.angularStiffness = Math.pow(0.98, i)) ;
+    .forEach((pin, i) => pin.angularStiffness = Math.pow(0.90, i)) ;
   // attach segments to each other
   Composites.chain(strand, 0.4, 0, -0.4, 0, {
     label: "pin",
     length: 0,
     stiffness: 1,
-    damping: 0.5,
     angularStiffness: opts.angularStiffness,
     render: {
       strokeStyle: '#4a485b'
@@ -102,7 +101,7 @@ function oneHair(start, hairOpts) {
     label: "tension",
     length: opts.length * (1 - opts.overlap/2) * (1 - opts.kinkiness),
     stiffness: opts.stiffness,
-    damping: 0.5,
+    damping: 0.05,
     anchor: false,
     render: {
       strokeStyle: '#4a485b'
@@ -153,12 +152,16 @@ function fix(parent, body, pinAngle, pinDist) {
 
 // main
 
-
-var follicles = [
-  {start: {x: 150, y: 160}, angle: Math.PI*0.3},
-  {start: {x: 50, y: 200}, angle: Math.PI*0.6},
-  {start: {x: 200, y: 200}, angle: Math.PI*0.9},
-];
+var follicles = [];
+var n_hairs = 30;
+for (var i = 0; i < n_hairs; i++) {
+  follicles.push(
+    {
+      start: {x: 250 + 300 / n_hairs * i, y: 185 + Math.random() * 30},
+      angle: Math.PI * i / n_hairs
+    }
+  );
+}
 
 var ground = Bodies.rectangle(350, 590, 800, 40, { isStatic: true });
 World.add(world, ground);
@@ -166,15 +169,13 @@ World.add(world, ground);
 var hairs = manyHairs(follicles);
 World.add(world, hairs);
 
-
-
 // add mouse control
 var mouse = Mouse.create(render.canvas);
 
 var mouseConstraint = MouseConstraint.create(engine, {
   mouse: mouse,
   constraint: {
-    stiffness: 0.2,
+    stiffness: 0.0,
     render: {
       visible: false
     }
@@ -184,10 +185,9 @@ var mouseConstraint = MouseConstraint.create(engine, {
 function makeCuttable(hair) {
   Events.on(
     mouseConstraint, "mousemove",
-    ({source: {body}}) => {
+    ({source, source: {body}}) => {
       if (body && hair.bodies.includes(body)) {
-        World.remove(hair, [body], true);
-        removeAllConstraints(hair, body);
+        cutAbove(hair, body);
       }
     });
 }
@@ -198,8 +198,8 @@ hairs.composites.forEach(makeCuttable);
 // this is fine because for now there is only hair
 // refactor this if we ever add anything else
 
-function removeAllConstraints(parent, body) {
-  var toDelete = parent.constraints.filter((c) => (c.bodyA === body) || (c.bodyB === body));
+function cutAbove(parent, body) {
+  var toDelete = parent.constraints.filter((c) => c.bodyB === body);
   World.remove(parent, toDelete);
 }
 
