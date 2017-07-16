@@ -52,7 +52,7 @@ function oneHair(start, hairOpts) {
     length: 30,
     width: 15,
     angle: Math.PI,
-    segmentsPerHair: 20,
+    segmentsPerHair: 10,
     angularStiffness: 0.95,
     stiffness: 0.6,
     kinkiness: 0.0,
@@ -160,7 +160,7 @@ var follicles = [
   {start: {x: 200, y: 200}, angle: Math.PI*0.9},
 ];
 
-var ground = Bodies.rectangle(350, 590, 800, 20, { isStatic: true });
+var ground = Bodies.rectangle(350, 590, 800, 40, { isStatic: true });
 World.add(world, ground);
 
 var hairs = manyHairs(follicles);
