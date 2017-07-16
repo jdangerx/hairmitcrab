@@ -37,6 +37,14 @@ Runner.run(runner, engine);
 var GROUP = Body.nextGroup(true);
 
 
+function manyHairs(follicles) {
+  var hairs = Composite.create();
+  follicles.forEach(({start, angle}) => {
+    Composite.add(hairs, oneHair(start, {angle: angle}));
+  });
+  return hairs;
+}
+
 // TODO where to put this
 world.gravity.scale = 0.01;
 
@@ -123,11 +131,17 @@ function fix(parent, body, pinAngle, pinDist) {
   }));
 }
 
+// main
 
-var start = {x: 350, y: 160};
 
-var strand = oneHair(start);
-World.add(world, strand);
+var follicles = [
+  {start: {x: 150, y: 160}, angle: Math.PI*0.3},
+  {start: {x: 50, y: 200}, angle: Math.PI*0.6},
+  {start: {x: 200, y: 200}, angle: Math.PI*0.9},
+];
+
+var hairs = manyHairs(follicles);
+World.add(world, hairs);
 
 
 
@@ -144,13 +158,18 @@ var mouseConstraint = MouseConstraint.create(engine, {
   }
 });
 
-// Events.on(mouseConstraint, "mousedown",
-//           ({source: {body}}) => {
-//             if (body) {
-//               World.remove(strand, [body], true);
-//               removeAllConstraints(strand, body);
-//             }
-//           });
+
+// TODO everything in the world is cuttable right now
+// this is fine because for now there is only hair
+// refactor this if we ever add anything else
+Events.on(mouseConstraint, "mousedown",
+          ({source: {body}}) => {
+            console.log(body);
+            if (body) {
+              World.remove(body.parent, [body], true);
+              removeAllConstraints(body.parnet, body);
+            }
+          });
 
 function removeAllConstraints(parent, body) {
   var toDelete = parent.constraints.filter((c) => (c.bodyA === body) || (c.bodyB === body));
