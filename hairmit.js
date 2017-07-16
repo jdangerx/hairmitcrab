@@ -149,6 +149,18 @@ function fix(parent, body, pinAngle, pinDist) {
   }));
 }
 
+function moveGravity(ts) {
+  world.gravity.x =
+    10 * world.gravity.scale * Math.sin(ts / (2000 + 500 * Math.random()));
+  world.gravity.y =
+    10 * world.gravity.scale * (1 + 0.3 * Math.sin(ts / (1500 * Math.random())));
+  window.requestAnimationFrame(
+    (ts) =>
+      {
+        moveGravity(ts);
+      });
+}
+
 // main
 
 var follicles = [];
@@ -212,3 +224,5 @@ Render.lookAt(render, {
   min: { x: 0, y: 0 },
   max: { x: 700, y: 600 }
 });
+
+moveGravity(Date.now());
