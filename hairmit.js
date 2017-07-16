@@ -151,9 +151,9 @@ function fix(parent, body, pinAngle, pinDist) {
 
 function moveGravity(ts) {
   world.gravity.x =
-    10 * world.gravity.scale * Math.sin(ts / (2000 + 500 * Math.random()));
+    3 * world.gravity.scale * Math.sin(ts / (2000 + 200 * Math.random()));
   world.gravity.y =
-    10 * world.gravity.scale * (1 + 0.3 * Math.sin(ts / (1500 * Math.random())));
+    10 * world.gravity.scale * (1 + 0.3 * Math.sin(ts / (1500 + 200 * Math.random())));
   window.requestAnimationFrame(
     (ts) =>
       {
