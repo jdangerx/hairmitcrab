@@ -201,7 +201,24 @@ function makeCuttable(hair) {
         cutAbove(hair, body);
       }
     });
+  Events.on(
+    mouseConstraint, "mousedown",
+    ({source, source: {body}}) => {
+      if (body && hair.bodies.includes(body)) {
+        cutAbove(hair, body);
+      }
+    });
 }
+
+const crab = Bodies.circle(
+  350, 300, 200,
+  {
+    render: {
+      sprite: { texture: 'img/blue_crab.jpg' }
+    }
+  });
+
+World.add(world, crab);
 
 hairs.composites.forEach(makeCuttable);
 
