@@ -210,11 +210,18 @@ function makeCuttable(hair) {
     });
 }
 
+// TODO attach hairs to this in a circle
 const crab = Bodies.circle(
-  350, 300, 200,
+  350, 300, 100,
   {
+    frictionAir: 0.8,
+    group: GROUP,
     render: {
-      sprite: { texture: 'img/blue_crab.jpg' }
+      sprite: {
+        texture: 'img/blue_crab.jpg',
+        xScale: 0.3,
+        yScale: 0.3
+      }
     }
   });
 
