@@ -13,7 +13,7 @@ var Engine = Matter.Engine,
     Vector = Matter.Vector;
 
 // create engine
-var engine = Engine.create(),
+var engine = Engine.create({ constraintIterations: 1 }),
     world = engine.world;
 
 // create renderer
@@ -34,32 +34,50 @@ Render.run(render);
 var runner = Runner.create();
 Runner.run(runner, engine);
 
-var GROUP = Body.nextGroup(true);
 
-function manyHairs(follicles) {
+function manyHairs(body, nHairs) {
   var hairs = Composite.create();
-  follicles.forEach(({start, angle}) => {
-    Composite.add(hairs, oneHair(start, {angle: angle}));
-  });
+  for (var i = 0; i < nHairs; i++) {
+    const angle = -Math.PI/nHairs * (i+1.5) * 0.75;
+    console.log(angle);
+    Composite.add(hairs, oneHair(body, {angle}));
+  }
   return hairs;
 }
 
 // TODO where to put this
 world.gravity.scale = 0.01;
 
-function oneHair(start, hairOpts) {
+const GROUPS =[
+  Body.nextGroup(true),
+  Body.nextGroup(true),
+  Body.nextGroup(true),
+  Body.nextGroup(true),
+];
+
+function getGroup() {
+  return GROUPS[Math.random() * GROUPS.length | 0];
+}
+function oneHair(circle, hairOpts) {
   var opts = {
     length: 30,
     width: 15,
     angle: Math.PI,
-    segmentsPerHair: 10,
+    segmentsPerHair: 5,
     angularStiffness: 0.95,
     stiffness: 0.2,
-    kinkiness: 0.3,
+    kinkiness: 0.0,
     overlap: 0.4,
   };
   Object.assign(opts, hairOpts);
+  const group = getGroup();
   // make actual hair bodies
+  const radius = circle.circleRadius;
+  const radiusOffset = 1.1 + Math.random() * 0.2;
+  const start = {
+    x: radiusOffset * radius * Math.cos(opts.angle),
+    y: radiusOffset * radius * Math.sin(opts.angle)
+  };
   var strand = Composites.stack(
     start.x,
     start.y,
@@ -68,11 +86,12 @@ function oneHair(start, hairOpts) {
     -opts.length * opts.overlap,
     0, (x, y) =>
       Bodies.rectangle(x, y, opts.length, opts.width, {
-      collisionFilter: { group: GROUP },
-      frictionAir: 0.1,
+      collisionFilter: { group },
+      frictionAir: 0.05,
+      frictionStatic: 5,
       chamfer: 5,
       render: {
-        fillStyle: 'pink',
+        fillStyle: 'brown',
         lineWidth: 0
       }
     })
@@ -89,19 +108,8 @@ function oneHair(start, hairOpts) {
   Composites.chain(strand, 0.4, 0, -0.4, 0, {
     label: "pin",
     length: 0,
-    stiffness: 1,
+    stiffness: 0.9,
     angularStiffness: opts.angularStiffness,
-    render: {
-      visible: false
-    }
-  });
-  // make them tense
-  Composites.chain(strand, 0, 0, 0, 0, {
-    label: "tension",
-    length: opts.length * (1 - opts.overlap/2) * (1 - opts.kinkiness),
-    stiffness: opts.stiffness,
-    damping: 0.05,
-    anchor: false,
     render: {
       visible: false
     }
@@ -110,7 +118,7 @@ function oneHair(start, hairOpts) {
   var firstSegment = strand.bodies[0];
   var startPoint = {x: firstSegment.position.x,
                     y: firstSegment.position.y};
-  fix(strand, firstSegment, opts.angle, opts.length/2);
+  fix(circle, strand, firstSegment, opts.angle, opts.length/2, radiusOffset);
   return strand;
 }
 
@@ -122,31 +130,36 @@ function project(point, angle, length){
 }
 
 
-function fix(parent, body, pinAngle, pinDist) {
-
-  Composite.add(parent, Constraint.create({
+function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
+  const pointA = {
+    x: radiusOffset * host.circleRadius * Math.cos(pinAngle),
+    y: radiusOffset * host.circleRadius * Math.sin(pinAngle)
+  };
+  Composite.add(composite, Constraint.create({
+    bodyA: host,
     bodyB: body,
+    pointA: pointA,
     pointB: { x: 0, y: 0 },
-    pointA: {x: body.position.x, y: body.position.y},
-    stiffness: 1,
+    stiffness: 0.5,
     length: 0,
     render: {
-      visible: false
+      // visible: false
     }
   }));
 
-  var pin = project(body.position, pinAngle, pinDist);
+  var pin = project(pointA, pinAngle, pinDist);
 
-  Composite.add(parent, Constraint.create({
-    bodyB: body,
-    pointB: { x: -pinDist, y: 0 },
-    pointA: pin,
-    stiffness: 1,
-    length: 0,
-    render: {
-      visible: false
-    }
-  }));
+  // Composite.add(composite, Constraint.create({
+  //   bodyA: host,
+  //   bodyB: body,
+  //   pointA: pin,
+  //   pointB: { x: -pinDist, y: 0 },
+  //   stiffness: 1,
+  //   length: 0,
+  //   render: {
+  //     visible: false
+  //   }
+  // }));
 }
 
 function moveGravity(ts) {
@@ -163,22 +176,8 @@ function moveGravity(ts) {
 
 // main
 
-var follicles = [];
-var n_hairs = 24;
-for (var i = 0; i < n_hairs; i++) {
-  follicles.push(
-    {
-      start: {x: 250 + 300 / n_hairs * i, y: 185 + Math.random() * 30},
-      angle: Math.PI * i / n_hairs
-    }
-  );
-}
-
 var ground = Bodies.rectangle(350, 590, 800, 40, { isStatic: true });
 World.add(world, ground);
-
-var hairs = manyHairs(follicles);
-World.add(world, hairs);
 
 // add mouse control
 var mouse = Mouse.create(render.canvas);
@@ -186,9 +185,9 @@ var mouse = Mouse.create(render.canvas);
 var mouseConstraint = MouseConstraint.create(engine, {
   mouse: mouse,
   constraint: {
-    stiffness: 0.0,
+    stiffness: 0.5,
     render: {
-      visible: false
+      // visible: false
     }
   }
 });
@@ -212,21 +211,26 @@ function makeCuttable(hair) {
 
 // TODO attach hairs to this in a circle
 const crab = Bodies.circle(
-  350, 300, 100,
+  350, 300, 80,
   {
     frictionAir: 0.8,
-    group: GROUP,
+    collisionFilter: { group: getGroup() },
+    isStatic: true,
     render: {
       sprite: {
         texture: 'img/blue_crab.jpg',
         xScale: 0.3,
-        yScale: 0.3
+        yScale: 0.3,
+        xOffset: -0.03,
+        yOffset: 0.08,
       }
     }
   });
 
 World.add(world, crab);
 
+var hairs = manyHairs(crab, 30);
+World.add(world, hairs);
 hairs.composites.forEach(makeCuttable);
 
 // TODO everything in the world is cuttable right now
@@ -235,7 +239,7 @@ hairs.composites.forEach(makeCuttable);
 
 function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
-  World.remove(parent, toDelete);
+  // World.remove(parent, toDelete);
 }
 
 World.add(world, mouseConstraint);
@@ -249,4 +253,4 @@ Render.lookAt(render, {
   max: { x: 700, y: 600 }
 });
 
-moveGravity(Date.now());
+// moveGravity(Date.now());
