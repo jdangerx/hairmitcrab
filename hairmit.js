@@ -240,13 +240,14 @@ function incrementScore(inc) {
   scoreboard.innerHTML = "SCORE: " + SCORE + exclamations;
 }
 
-function crabSay(dialogue, undismissable) {
+function crabSay(dialogue, gameOver) {
   cuttingToggle("off");
   var dialogueBox = document.getElementById("crabSay");
   dialogueBox.className = "";
   dialogueBox.innerHTML = dialogue;
-  if (undismissable === true) {
-    dialogueBox.onclick = () => {};
+  if (gameOver === true) {
+    // https://stackoverflow.com/questions/10839989/why-cant-i-pass-window-location-reload-as-an-argument-to-settimeout
+    dialogueBox.onclick = window.location.reload.bind(window.location);
   } else {
     dialogueBox.onclick = () => {
       dialogueBox.className = "hidden";
@@ -270,6 +271,8 @@ function setupTimer() {
   document.getElementById("timeText").className = "";
 }
 
+WentCritical = false;
+
 function updateTimer(ts) {
   let maxTime = 10.0;
   let remaining = maxTime - (ts - HairExists)/1000.0;
@@ -279,9 +282,13 @@ function updateTimer(ts) {
   let emptyBar = document.getElementById("emptyBar");
   // TODO handle chaging from red to green when not much time is left
   if (remaining < 3) {
+    if (!WentCritical) {
+      WentCritical = true;
+      document.getElementById("timeText").className = "critical blink";
+      let soundtrack = document.getElementById("soundtrack");
+      soundtrack.playbackRate = 1.3;
+    }
     var fullBar = document.getElementById("redBar");
-    document.getElementById("timeText").className = "critical blink";
-    document.getElementById("soundtrack").playbackRate = 1.1;
   } else {
     var fullBar = document.getElementById("greenBar");
   }
@@ -546,7 +553,6 @@ function startMusic() {
 }
 
 function startGame() {
-  World.add(world, hairs);
   HairExists = performance.now();
   setupTimer();
   updateTimer(HairExists);
@@ -562,6 +568,7 @@ function updateOpacities(ts) {
   titleScreen.render.opacity = titleOpacity;
   if (titleOpacity <= 0) {
     let intro = crabSay(greet());
+    World.add(world, hairs);
     intro.onclick = () => {
       intro.className = "hidden";
       startGame();
