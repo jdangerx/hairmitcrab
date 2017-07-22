@@ -224,6 +224,7 @@ function crabSay(dialogue, undismissable) {
       cuttingToggle("on");
     };
   }
+  return dialogueBox;
 }
 
 function updateTimer(ts) {
@@ -424,8 +425,19 @@ function startFade() {
 }
 
 document.querySelector("body").addEventListener("click", startFade);
+var hairs = manyHairs(crab, 20);
 
 const FADE_SECONDS = 0.5;
+const cuttingToggle = makeCuttingToggle(hairs);
+
+function startGame() {
+  console.log("hi!!");
+  World.add(world, hairs);
+  HairExists = performance.now();
+  updateTimer(HairExists);
+  cuttingToggle("on");
+  incrementScore(0);
+}
 
 function updateOpacities(ts) {
   // InitialTimestamp is a global variable set in startFade
@@ -433,14 +445,13 @@ function updateOpacities(ts) {
   let titleOpacity = Math.max(0, 1 - elapsed / FADE_SECONDS);
   titleScreen.render.opacity = titleOpacity;
   if (titleOpacity <= 0) {
-    // we need to wait to add the hairs til click now, since constraints don't have an opacity control
-    var hairs = manyHairs(crab, 20);
-    World.add(world, hairs);
-    cuttingToggle = makeCuttingToggle(hairs);
-    HairExists = performance.now();
-    updateTimer(HairExists);
-    cuttingToggle("on");
-    incrementScore(0);
+    let intro = crabSay("Hello! I'm a crab and I would like to be where the people are.");
+    intro.onclick = () => {
+      intro.className = "hidden";
+      console.log("hi");
+      startGame();
+      console.log("hi!");
+    };
   } else {
     window.requestAnimationFrame(updateOpacities);
   }
