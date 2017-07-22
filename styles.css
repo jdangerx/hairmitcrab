@@ -1,11 +1,7 @@
-canvas {
-    background:url(http://expeditionwriter.com/wp-content/uploads/2014/04/1305834844-underwater-blue-ocean-water-savedcontributing-once-againthanks-wallpaper1.jpg)
-}
-
-canvas {
+.scissorCursor {
     cursor: url(img/scissors-1.png) 22 27, auto;
 }
 
-canvas:active {
+.scissorCursor:active {
     cursor: url(img/scissors-2.png) 22 27, auto;
 }

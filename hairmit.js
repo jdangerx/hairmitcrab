@@ -335,6 +335,15 @@ render.canvas.addEventListener("click", startFade);
 
 const FADE_SECONDS = 3;
 
+function playSnip(){
+  var audio = document.createElement("audio");
+  audio.src = "snip.mp3";
+  audio.addEventListener("ended", function () {
+    document.removeChild(this);
+  }, false);
+  audio.play();
+}
+
 function updateOpacities(ts) {
   // InitialTimestamp is a global variable set in startFade
   let elapsed = (ts - InitialTimestamp)/1000;
@@ -345,21 +354,12 @@ function updateOpacities(ts) {
     var hairs = manyHairs(crab, 20);
     World.add(world, hairs);
     hairs.composites.forEach(makeCuttable);
+    // make scissors make noise
+    render.canvas.addEventListener("click", playSnip);
+    // activate scissor cursor
+    render.canvas.className += " scissorCursor";
+    // TODO
   } else {
     window.requestAnimationFrame(updateOpacities);
   }
 }
-
-
-// scissor noise stuff
-
-function playSnip(){
-  var audio = document.createElement("audio");
-  audio.src = "snip.mp3";
-  audio.addEventListener("ended", function () {
-    document.removeChild(this);
-  }, false);
-  audio.play();
-}
-
-document.querySelector("canvas").addEventListener("click", playSnip);
