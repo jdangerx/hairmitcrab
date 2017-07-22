@@ -58,10 +58,15 @@ div {
 }
 
 #timer {
-  top: 10px;
-  left: 500px;
-  text-shadow: 5px 5px 5px #333333;
-  font-family: sans-serif;
+  position: absolute;
+  top: 15px;
+  left: 600px;
+  width: 206px;
+  heighty: 28px;
+}
+
+#timer:before {
+    content: "TIME: ";
 }
 
 .critical {

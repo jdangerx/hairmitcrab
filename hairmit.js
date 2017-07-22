@@ -256,21 +256,29 @@ function crabSay(dialogue, undismissable) {
   return dialogueBox;
 }
 
+function setupTimer() {
+  let timer = document.getElementById("timer");
+  let ctx = timer.getContext("2d");
+  ctx.fillStyle = "transparent";
+  ctx.fillRect(0, 0, timer.width, timer.height);
+  let emptyBar = document.getElementById("emptyBar");
+  let fullBar = document.getElementById("greenBar");
+  ctx.drawImage(emptyBar, 0, 0);
+  ctx.drawImage(fullBar, 0, 0);
+}
+
 function updateTimer(ts) {
   let maxTime = 10;
   let remaining = maxTime - (ts - HairExists)/1000 | 0;
   let timer = document.getElementById("timer");
-  var timerBar = "";
-  for (var i = 0; i < remaining; i++) {
-    timerBar = timerBar + "|";
-  }
-  timer.innerHTML = "TIME: " + timerBar;
-
-  if (remaining <= 5) {
-    timer.className = "critical blink";
-  } else {
-    timer.className = "ok";
-  }
+  let ctx = timer.getContext("2d");
+  let fractionRemaining = remaining / maxTime;
+  let emptyBar = document.getElementById("emptyBar");
+  // TODO handle chaging from red to green when not much time is left
+  let fullBar = document.getElementById("greenBar");
+  ctx.clearRect(0,0,timer.width,timer.height);
+  ctx.drawImage(emptyBar, 0, 0);
+  ctx.drawImage(fullBar, 0, 0, 209*fractionRemaining, 28, 0, 0, 209*fractionRemaining, 28);
   if (remaining > 0) {
     window.requestAnimationFrame((ts) => updateTimer(ts));
   } else {
@@ -513,6 +521,7 @@ const cuttingToggle = makeCuttingToggle(hairs);
 function startGame() {
   World.add(world, hairs);
   HairExists = performance.now();
+  setupTimer();
   updateTimer(HairExists);
   cuttingToggle("on");
   incrementScore(0);
