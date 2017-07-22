@@ -280,9 +280,19 @@ const crab = Bodies.circle(
 
 World.add(world, crab);
 
+function playSnip(){
+  var audio = document.createElement("audio");
+  audio.src = "snip.mp3";
+  audio.addEventListener("ended", function () {
+    document.removeChild(this);
+  }, false);
+  audio.play();
+}
+
 function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
   World.remove(parent, toDelete);
+  playSnip();
 }
 
 World.add(world, mouseConstraint);
@@ -335,15 +345,6 @@ render.canvas.addEventListener("click", startFade);
 
 const FADE_SECONDS = 3;
 
-function playSnip(){
-  var audio = document.createElement("audio");
-  audio.src = "snip.mp3";
-  audio.addEventListener("ended", function () {
-    document.removeChild(this);
-  }, false);
-  audio.play();
-}
-
 function updateOpacities(ts) {
   // InitialTimestamp is a global variable set in startFade
   let elapsed = (ts - InitialTimestamp)/1000;
@@ -354,8 +355,6 @@ function updateOpacities(ts) {
     var hairs = manyHairs(crab, 20);
     World.add(world, hairs);
     hairs.composites.forEach(makeCuttable);
-    // make scissors make noise
-    render.canvas.addEventListener("click", playSnip);
     // activate scissor cursor
     render.canvas.className += " scissorCursor";
     // TODO
