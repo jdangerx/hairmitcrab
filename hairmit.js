@@ -349,3 +349,17 @@ function updateOpacities(ts) {
     window.requestAnimationFrame(updateOpacities);
   }
 }
+
+
+// scissor noise stuff
+
+function playSnip(){
+  var audio = document.createElement("audio");
+  audio.src = "snip.mp3";
+  audio.addEventListener("ended", function () {
+    document.removeChild(this);
+  }, false);
+  audio.play();
+}
+
+document.querySelector("canvas").addEventListener("click", playSnip);
