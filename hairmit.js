@@ -255,13 +255,6 @@ const crab = Bodies.circle(
 
 World.add(world, crab);
 
-var hairs = manyHairs(crab, 20);
-World.add(world, hairs);
-hairs.composites.forEach(makeCuttable);
-
-// TODO everything in the world is cuttable right now
-// this is fine because for now there is only hair
-// refactor this if we ever add anything else
 
 function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
@@ -307,24 +300,30 @@ const titleScreen = Bodies.rectangle(
 
 World.add(world, titleScreen);
 
+function startFade() {
+  // global variables lolllll
+  InitialTimestamp = performance.now();
+  console.log(InitialTimestamp);
+  window.requestAnimationFrame(updateOpacities);
+  render.canvas.removeEventListener("click", startFade);
+}
 
-const INITIAL_TIMESTAMP = performance.now();
-const LET_STAY_SECONDS = 3;
-const FADE_SECONDS = 2;
+render.canvas.addEventListener("click", startFade);
 
+const FADE_SECONDS = 3;
 
 function updateOpacities(ts) {
-  let elapsed = (ts - INITIAL_TIMESTAMP)/1000;
-  let hairsOpacity = Math.max(0, elapsed - LET_STAY_SECONDS) / FADE_SECONDS;
-  let titleOpacity = Math.max(0, 1 - hairsOpacity); // for some reason it goes negative sometimes, prevent this with Math.max
+  // InitialTimestamp is a global variable set in startFade
+  let elapsed = (ts - InitialTimestamp)/1000;
+  let titleOpacity = Math.max(0, 1 - elapsed / FADE_SECONDS);
   console.log(titleOpacity);
   titleScreen.render.opacity = titleOpacity;
-  Composite.allBodies(hairs).forEach(
-    (body) => body.render.opacity = hairsOpacity
-  );
-  if (hairsOpacity < 1) {
+  if (titleOpacity <= 0) {
+    // we need to wait to add the hairs til click now, since constraints don't have an opacity control
+    var hairs = manyHairs(crab, 20);
+    World.add(world, hairs);
+    hairs.composites.forEach(makeCuttable);
+  } else {
     window.requestAnimationFrame(updateOpacities);
   }
 }
-
-window.requestAnimationFrame(updateOpacities);
