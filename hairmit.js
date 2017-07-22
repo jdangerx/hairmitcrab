@@ -62,8 +62,12 @@ const GROUPS =[
   Body.nextGroup(true),
 ];
 
+function randChoice(arr) {
+  return arr[Math.random() * arr.length | 0];
+}
+
 function getGroup() {
-  return GROUPS[Math.random() * GROUPS.length | 0];
+  return randChoice(GROUPS);
 }
 
 function oneHair(circle, hairOpts) {
@@ -272,6 +276,57 @@ function evaluateScore() {
   }
 }
 
+function greet() {
+  let mbti =
+        randChoice(["E", "I"]) +
+        randChoice(["S", "N"]) +
+        randChoice(["T", "F"]) +
+        randChoice(["J", "P"]);
+  let firstName = randChoice(
+    [
+      "Jonas",
+      "Arthur",
+      "Nelson",
+      "Ptolemy",
+      "Herman",
+      "Lucille",
+      "Frances",
+      "Grenolde",
+      "Deirdre",
+      "Sydney"
+    ]
+  );
+
+  let lastName = randChoice(
+    [
+      "Crabber",
+      "Crabby",
+      "Blue",
+      "Crabcake",
+      "Landcrab",
+      "Craborama",
+      "Crabbo",
+      "McCrab",
+      "Crabbeson"
+    ]
+  );
+
+  let celeb = randChoice(
+    [
+      "John Cena",
+      "Vin Diesel",
+      "Dwayne Johnson",
+      "Saitama",
+      "Aang",
+      "Jet Black",
+      "Skrillex",
+      "Imperator Furiosa",
+    ]
+  );
+
+  return "Hi, my name is " + firstName + " " + lastName + " and I'm an " + mbti + ". Can you make me look like " + celeb + "?";
+}
+
 // main
 
 // Hack for rounding the corners on constriants so they look like hair, usually they're rectangualar
@@ -445,7 +500,7 @@ function updateOpacities(ts) {
   let titleOpacity = Math.max(0, 1 - elapsed / FADE_SECONDS);
   titleScreen.render.opacity = titleOpacity;
   if (titleOpacity <= 0) {
-    let intro = crabSay("Hello! I'm a crab and I would like to be where the people are.");
+    let intro = crabSay(greet());
     intro.onclick = () => {
       intro.className = "hidden";
       console.log("hi");
