@@ -13,7 +13,7 @@ var Engine = Matter.Engine,
     Vector = Matter.Vector;
 
 // create engine
-var engine = Engine.create({ constraintIterations: 1 }),
+var engine = Engine.create({ constraintIterations: 1, positionIterations: 1, velocityIterations: 1 }),
     world = engine.world;
 
 // create renderer
@@ -39,7 +39,6 @@ function manyHairs(body, nHairs) {
   var hairs = Composite.create();
   for (var i = 0; i < nHairs; i++) {
     const angle = -Math.PI/nHairs * (i+1.5) * 0.75;
-    console.log(angle);
     Composite.add(hairs, oneHair(body, {angle}));
   }
   return hairs;
@@ -61,7 +60,7 @@ function getGroup() {
 function oneHair(circle, hairOpts) {
   var opts = {
     length: 30,
-    width: 10,
+    width: 15,
     angle: Math.PI,
     segmentsPerHair: 10,
     angularStiffness: 0.95,
@@ -87,8 +86,11 @@ function oneHair(circle, hairOpts) {
     0, (x, y) =>
       Bodies.rectangle(x, y, opts.length, opts.width, {
       collisionFilter: { group },
-      frictionAir: 0.05,
-      frictionStatic: 5,
+      chamfer: 5,
+      frictionAir: 1,
+      friction: 1,
+      restitution: 0,
+      slop: 0.3,
       render: {
         fillStyle: 'brown',
         lineWidth: 0
@@ -104,7 +106,7 @@ function oneHair(circle, hairOpts) {
     .filter(({label}) => label === "pin")
     .forEach((pin, i) => pin.angularStiffness = Math.pow(0.90, i)) ;
   // attach segments to each other
-  Composites.chain(strand, 0.4, 0, -0.4, 0, {
+  Composites.chain(strand, 0.3, 0, -0.3, 0, {
     label: "pin",
     length: 0,
     stiffness: 0.9,
@@ -142,7 +144,7 @@ function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
     stiffness: 0.5,
     length: 0,
     render: {
-      // visible: false
+      visible: false
     }
   }));
 
@@ -151,9 +153,9 @@ function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
 
 function moveGravity(ts) {
   world.gravity.x =
-    3 * world.gravity.scale * Math.sin(ts / (2000 + 200 * Math.random()));
+    30 * world.gravity.scale * Math.sin(ts / 2000);
   world.gravity.y =
-    10 * world.gravity.scale * (1 + 0.3 * Math.sin(ts / (1500 + 200 * Math.random())));
+    100 * world.gravity.scale * (1 + 0.3 * Math.sin(ts / 1500));
   window.requestAnimationFrame(
     (ts) =>
       {
@@ -203,6 +205,8 @@ const crab = Bodies.circle(
     frictionAir: 0.8,
     collisionFilter: { group: getGroup() },
     isStatic: true,
+    restitution: 0,
+    slop: 0.1,
     render: {
       sprite: {
         texture: 'img/blue_crab.jpg',
@@ -216,7 +220,7 @@ const crab = Bodies.circle(
 
 World.add(world, crab);
 
-var hairs = manyHairs(crab, 30);
+var hairs = manyHairs(crab, 20);
 World.add(world, hairs);
 hairs.composites.forEach(makeCuttable);
 
