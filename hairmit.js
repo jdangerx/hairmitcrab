@@ -203,8 +203,7 @@ function moveGravity(ts) {
 
 // main
 
-var ground = Bodies.rectangle(400, 590, 800, 40, { isStatic: true });
-World.add(world, ground);
+// Hack for rounding the corners on constriants so they look like hair, usually they're rectangualar
 render.context.lineCap = "round";
 
 // add mouse control
@@ -238,6 +237,28 @@ function makeCuttable(hair) {
 }
 
 
+const oceanBackground = Bodies.rectangle(
+  0, 0, WIDTH, HEIGHT,
+  {
+    collisionFilter: { group: getGroup() },
+    isStatic: true,
+    restitution: 0,
+    render: {
+      sprite: {
+        texture: 'https://ak2.picdn.net/shutterstock/videos/896608/thumb/1.jpg?i10c=img.resize(height:160)',
+        yScale: 1.5,
+        xOffset: -0.5,
+        yOffset: -0.5,
+      }
+    }
+  });
+
+World.add(world, oceanBackground);
+
+var ground = Bodies.rectangle(400, 590, 800, 40, { isStatic: true, render: {visible: false} });
+World.add(world, ground);
+
+
 const crab = Bodies.circle(
   400, 300, 80,
   {
@@ -258,7 +279,6 @@ const crab = Bodies.circle(
   });
 
 World.add(world, crab);
-
 
 function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
