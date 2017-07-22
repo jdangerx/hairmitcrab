@@ -6,14 +6,17 @@
     cursor: url(img/scissors-2.png) 22 27, auto;
 }
 
+div {
+  color: white;
+  font-size: 24pt;
+}
+
 #scoreboard {
   float: left;
   position: absolute;
   top: 10px;
   left: 10px;
-  color: white;
   text-shadow: 5px 5px 5px #333333;
-  font-size: 24pt;
   font-family: sans-serif;
 }
 
@@ -54,4 +57,18 @@
     0% { opacity: 1.0; }
     50% { opacity: 0.0; }
     100% { opacity: 1.0; }
+}
+
+#timer {
+  float: left;
+  position: absolute;
+  top: 10px;
+  left: 650px;
+  text-shadow: 5px 5px 5px #333333;
+  font-family: sans-serif;
+}
+
+.critical {
+  color: red;
+  font-size: 36;
 }

@@ -207,10 +207,37 @@ function incrementScore(inc) {
   const scoreboard = document.getElementById("scoreboard");
   SCORE = SCORE + inc;
   var exclamations = "";
-  for (i = 0; i < (SCORE - 5) / 5; i++) {
+  for (var i = 0; i < (SCORE - 5) / 5; i++) {
     exclamations = exclamations + "!";
   }
   scoreboard.innerHTML = "SCORE: " + SCORE + exclamations;
+}
+
+function updateTimer(ts) {
+  let maxTime = 10;
+  let remaining = maxTime - (ts - HairExists)/1000 | 0;
+  let timer = document.getElementById("timer");
+  var timerBar = "";
+  for (var i = 0; i < remaining / 5; i++) {
+    timerBar = timerBar + "|";
+  }
+  timer.innerHTML = "TIME: " + timerBar;
+
+  if (remaining <= 5) {
+    timer.className = "critical blink";
+  } else {
+    timer.className = "ok";
+  }
+  if (remaining > 0) {
+    window.requestAnimationFrame((ts) => updateTimer(ts));
+  } else {
+    endGame();
+  }
+}
+
+function endGame() {
+  World.remove(world, Composite.allBodies(world));
+  console.log("YOU WIN");
 }
 
 // main
@@ -359,7 +386,7 @@ function startFade() {
 
 document.querySelector("body").addEventListener("click", startFade);
 
-const FADE_SECONDS = 3;
+const FADE_SECONDS = 0.5;
 
 function updateOpacities(ts) {
   // InitialTimestamp is a global variable set in startFade
@@ -370,7 +397,9 @@ function updateOpacities(ts) {
     // we need to wait to add the hairs til click now, since constraints don't have an opacity control
     var hairs = manyHairs(crab, 20);
     World.add(world, hairs);
+    HairExists = performance.now();
     hairs.composites.forEach(makeCuttable);
+    updateTimer(HairExists);
     // activate scissor cursor
     render.canvas.className += " scissorCursor";
     incrementScore(0);
