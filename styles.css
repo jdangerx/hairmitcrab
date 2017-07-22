@@ -70,11 +70,13 @@ div {
 }
 
 #crabSay {
-  font-family: fixed-width;
+  font-family: monospace;
   width: 800;
-  height: 150;
+  height: 160;
   top: 450;
-  background-color: black;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 1em;
+  box-sizing: border-box;
 }
 
 .hidden {

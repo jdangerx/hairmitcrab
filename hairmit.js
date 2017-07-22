@@ -211,14 +211,18 @@ function incrementScore(inc) {
   scoreboard.innerHTML = "SCORE: " + SCORE + exclamations;
 }
 
-function crabSay(dialogue) {
+function crabSay(dialogue, undismissable) {
   cuttingToggle("off");
   var dialogueBox = document.getElementById("crabSay");
   dialogueBox.className = "";
   dialogueBox.innerHTML = dialogue;
-  dialogueBox.onclick = () => {
-    dialogueBox.className = "hidden";
-    cuttingToggle("on");
+  if (undismissable === true) {
+    dialogueBox.onclick = () => {};
+  } else {
+    dialogueBox.onclick = () => {
+      dialogueBox.className = "hidden";
+      cuttingToggle("on");
+    };
   }
 }
 
@@ -247,6 +251,24 @@ function updateTimer(ts) {
 function endGame() {
   document.getElementById("timer").className = "critical";
   cuttingToggle("off");
+  crabSay(evaluateScore(), true);
+}
+
+function evaluateScore() {
+  switch (SCORE / 5 | 0) {
+  case 0:
+    return "Horrible! I'd hoped you'd do better with thumbs.";
+  case 1:
+    return "Mediocre... good thing there's only one hour before my next haircut appointment!";
+  case 2:
+    return "Honourable. It's okay, my hair grows out pretty quick. Nobody has to know.";
+  case 3:
+    return "Excellent! My friends will love it!";
+  case 4:
+    return "Amazing! The townspeople will be talking about this for weeks!";
+  default:
+    return "Legendary! Everyone will be left speechless, with stars in their eyes!"
+  }
 }
 
 // main
