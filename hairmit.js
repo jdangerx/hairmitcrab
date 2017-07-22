@@ -275,7 +275,12 @@ function updateTimer(ts) {
   let fractionRemaining = remaining / maxTime;
   let emptyBar = document.getElementById("emptyBar");
   // TODO handle chaging from red to green when not much time is left
-  let fullBar = document.getElementById("greenBar");
+  if (remaining < 3) {
+    var fullBar = document.getElementById("redBar");
+    document.getElementById("timeText").className = "critical blink";
+  } else {
+    var fullBar = document.getElementById("greenBar");
+  }
   ctx.clearRect(0,0,timer.width,timer.height);
   ctx.drawImage(emptyBar, 0, 0);
   ctx.drawImage(fullBar, 0, 0, 209*fractionRemaining, 28, 0, 0, 209*fractionRemaining, 28);
@@ -287,7 +292,9 @@ function updateTimer(ts) {
 }
 
 function endGame() {
-  document.getElementById("timer").className = "critical";
+  document.getElementById("timeText").innerHTML = "GAME OVER!";
+  // this is just to remove the blinking
+  document.getElementById("timeText").className = "critical";
   cuttingToggle("off");
   crabSay(evaluateScore(), true);
 }
@@ -452,7 +459,7 @@ World.add(world, crab);
 
 function playSnip(){
   var audio = document.createElement("audio");
-  audio.src = "snip.mp3";
+  audio.src = "static/snip.mp3";
   audio.play();
 }
 

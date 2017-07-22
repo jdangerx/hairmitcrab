@@ -1,9 +1,9 @@
 .scissorCursor {
-    cursor: url(img/scissors-1.png) 22 27, auto;
+    cursor: url(../img/scissors-1.png) 22 27, auto;
 }
 
 .scissorCursor:active {
-    cursor: url(img/scissors-2.png) 22 27, auto;
+    cursor: url(../img/scissors-2.png) 22 27, auto;
 }
 
 div {
@@ -16,8 +16,10 @@ div {
 #scoreboard {
   top: 10px;
   left: 10px;
-  text-shadow: 5px 5px 5px #333333;
-  font-family: sans-serif;
+  text-shadow: 2px 2px 2px #333333;
+  font-size: 60;
+  font-family: VT323;
+
 }
 
 #continue {
@@ -65,17 +67,22 @@ div {
   heighty: 28px;
 }
 
-#timer:before {
-    content: "TIME: ";
+#timeText {
+  position: absolute;
+  top: 7px;
+  left: 430px;
+  text-shadow: 2px 2px 2px #333333;
+  font-size: 40;
+  font-family: VT323;
 }
 
 .critical {
   color: red;
-  font-size: 36;
 }
 
 #crabSay {
-  font-family: monospace;
+  font-family: VT323;
+  font-size: 40;
   width: 800;
   height: 160;
   top: 450;
