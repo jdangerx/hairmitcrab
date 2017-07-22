@@ -218,7 +218,7 @@ function updateTimer(ts) {
   let remaining = maxTime - (ts - HairExists)/1000 | 0;
   let timer = document.getElementById("timer");
   var timerBar = "";
-  for (var i = 0; i < remaining / 5; i++) {
+  for (var i = 0; i < remaining; i++) {
     timerBar = timerBar + "|";
   }
   timer.innerHTML = "TIME: " + timerBar;
@@ -236,8 +236,8 @@ function updateTimer(ts) {
 }
 
 function endGame() {
-  World.remove(world, Composite.allBodies(world));
-  console.log("YOU WIN");
+  document.getElementById("timer").className = "critical";
+  Events.off(mouseConstraint);
 }
 
 // main
