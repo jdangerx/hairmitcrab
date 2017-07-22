@@ -281,6 +281,7 @@ function updateTimer(ts) {
   if (remaining < 3) {
     var fullBar = document.getElementById("redBar");
     document.getElementById("timeText").className = "critical blink";
+    document.getElementById("soundtrack").playbackRate = 1.1;
   } else {
     var fullBar = document.getElementById("greenBar");
   }
@@ -294,12 +295,22 @@ function updateTimer(ts) {
   }
 }
 
+function stopMusic() {
+  document.getElementById("soundtrack").pause();
+}
+
+function playBuzzer() {
+  document.getElementById("buzzer").play();
+}
+
 function endGame() {
   document.getElementById("timeText").innerHTML = "GAME OVER!";
   // this is just to remove the blinking
   document.getElementById("timeText").className = "critical";
   cuttingToggle("off");
   crabSay(evaluateScore(), true);
+  stopMusic();
+  playBuzzer();
 }
 
 function evaluateScore() {
@@ -528,6 +539,12 @@ var hairs = manyHairs(crab, 20);
 const FADE_SECONDS = 0.5;
 const cuttingToggle = makeCuttingToggle(hairs);
 
+function startMusic() {
+  let soundtrack = document.getElementById("soundtrack");
+  soundtrack.currentTime = 21;
+  soundtrack.play();
+}
+
 function startGame() {
   World.add(world, hairs);
   HairExists = performance.now();
@@ -535,6 +552,7 @@ function startGame() {
   updateTimer(HairExists);
   cuttingToggle("on");
   incrementScore(0);
+  startMusic();
 }
 
 function updateOpacities(ts) {
