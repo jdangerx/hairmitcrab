@@ -43,9 +43,10 @@ Runner.run(runner, engine);
 
 function manyHairs(body, nHairs) {
   var hairs = Composite.create();
+  const {color, shadow} = randColorAndShadow();
   for (var i = 0; i < nHairs; i++) {
     const angle = -Math.PI/nHairs * (i+1.5) * 0.75;
-    Composite.add(hairs, oneHair(body, {angle}));
+    Composite.add(hairs, oneHair(body, {angle, color, shadow}));
   }
   return hairs;
 }
@@ -69,6 +70,30 @@ function randChoice(arr) {
 function getGroup() {
   return randChoice(GROUPS);
 }
+
+function rand256() {
+  return Math.random() * 256 | 0;
+}
+function toHex(i) {
+  var hex = i.toString(16);
+  if (hex.length < 2) {
+    return "0" + hex;
+  }
+  return hex;
+}
+function randColorAndShadow() {
+  let r = rand256(),
+      g = rand256(),
+      b = rand256(),
+      r_shadow = r * 0.7 | 0,
+      g_shadow = g * 0.7 | 0,
+      b_shadow = b * 0.7 | 0;
+  return {
+    color: "#" + toHex(r) + toHex(g) + toHex(b),
+    shadow: "#" + toHex(r_shadow) + toHex(g_shadow) + toHex(b_shadow)
+  };
+}
+
 
 function oneHair(circle, hairOpts) {
   var opts = {
@@ -141,7 +166,7 @@ function oneHair(circle, hairOpts) {
       anchors: false,
       type: "line",
       lineWidth: 15,
-      strokeStyle: "#442200",
+      strokeStyle: opts.shadow,
     }
   });
 
@@ -154,7 +179,7 @@ function oneHair(circle, hairOpts) {
       anchors: false,
       type: "line",
       lineWidth: 12,
-      strokeStyle: "#663300",
+      strokeStyle: opts.color,
     }
   });
   // fix the first one
@@ -486,7 +511,6 @@ const FADE_SECONDS = 0.5;
 const cuttingToggle = makeCuttingToggle(hairs);
 
 function startGame() {
-  console.log("hi!!");
   World.add(world, hairs);
   HairExists = performance.now();
   updateTimer(HairExists);
@@ -503,9 +527,7 @@ function updateOpacities(ts) {
     let intro = crabSay(greet());
     intro.onclick = () => {
       intro.className = "hidden";
-      console.log("hi");
       startGame();
-      console.log("hi!");
     };
   } else {
     window.requestAnimationFrame(updateOpacities);
