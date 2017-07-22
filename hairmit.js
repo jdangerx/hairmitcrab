@@ -238,6 +238,7 @@ function updateTimer(ts) {
 function endGame() {
   document.getElementById("timer").className = "critical";
   Events.off(mouseConstraint);
+  render.canvas.className = "";
 }
 
 // main
