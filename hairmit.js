@@ -13,7 +13,7 @@ var Engine = Matter.Engine,
     Vector = Matter.Vector;
 
 // create engine
-var engine = Engine.create({ constraintIterations: 1, positionIterations: 1, velocityIterations: 1 }),
+var engine = Engine.create({ constraintIterations: 1, positionIterations: 2, velocityIterations: 2 }),
     world = engine.world;
 
 const WIDTH = 800;
@@ -33,8 +33,6 @@ var render = Render.create({
 
 Render.run(render);
 
-
-
 // create runner
 var runner = Runner.create();
 Runner.run(runner, engine);
@@ -51,9 +49,14 @@ function manyHairs(body, nHairs) {
 }
 
 // TODO where to put this
-world.gravity.scale = 0.01;
+world.gravity.scale = 0.08;
 
 const GROUPS =[
+  Body.nextGroup(true),
+  Body.nextGroup(true),
+  Body.nextGroup(true),
+  Body.nextGroup(true),
+  Body.nextGroup(true),
   Body.nextGroup(true),
   Body.nextGroup(true),
   Body.nextGroup(true),
@@ -81,8 +84,8 @@ function oneHair(circle, hairOpts) {
   const radius = circle.circleRadius;
   const radiusOffset = 1.1 + Math.random() * 0.2;
   const start = {
-    x: radiusOffset * radius * Math.cos(opts.angle),
-    y: radiusOffset * radius * Math.sin(opts.angle)
+    x: circle.position.x + radiusOffset * radius * Math.cos(opts.angle),
+    y: circle.position.y + radiusOffset * radius * Math.sin(opts.angle)
   };
   var strand = Composites.stack(
     start.x,
@@ -175,7 +178,7 @@ function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
     bodyB: body,
     pointA: pointA,
     pointB: { x: 0, y: 0 },
-    stiffness: 0.5,
+    stiffness: 1,
     length: 0,
     render: {
       visible: false
@@ -187,9 +190,9 @@ function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
 
 function moveGravity(ts) {
   world.gravity.x =
-    30 * world.gravity.scale * Math.sin(ts / 2000);
+    0.3 * world.gravity.scale * Math.sin(ts / 2000);
   world.gravity.y =
-    100 * world.gravity.scale * (1 + 0.3 * Math.sin(ts / 1500));
+    1 * world.gravity.scale * (1 + 0.3 * Math.sin(ts / 1500));
   window.requestAnimationFrame(
     (ts) =>
       {
@@ -303,7 +306,6 @@ World.add(world, titleScreen);
 function startFade() {
   // global variables lolllll
   InitialTimestamp = performance.now();
-  console.log(InitialTimestamp);
   window.requestAnimationFrame(updateOpacities);
   render.canvas.removeEventListener("click", startFade);
 }
@@ -316,7 +318,6 @@ function updateOpacities(ts) {
   // InitialTimestamp is a global variable set in startFade
   let elapsed = (ts - InitialTimestamp)/1000;
   let titleOpacity = Math.max(0, 1 - elapsed / FADE_SECONDS);
-  console.log(titleOpacity);
   titleScreen.render.opacity = titleOpacity;
   if (titleOpacity <= 0) {
     // we need to wait to add the hairs til click now, since constraints don't have an opacity control
