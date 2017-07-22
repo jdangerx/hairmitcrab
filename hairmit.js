@@ -16,13 +16,16 @@ var Engine = Matter.Engine,
 var engine = Engine.create({ constraintIterations: 1, positionIterations: 1, velocityIterations: 1 }),
     world = engine.world;
 
+const WIDTH = 800;
+const HEIGHT = 600;
+
 // create renderer
 var render = Render.create({
   element: document.body,
   engine: engine,
   options: {
-    width: 800,
-    height: 600,
+    width: WIDTH,
+    height: HEIGHT,
     wireframes: false,
     background: '#9999cc'
   }
@@ -30,10 +33,13 @@ var render = Render.create({
 
 Render.run(render);
 
+
+
 // create runner
 var runner = Runner.create();
 Runner.run(runner, engine);
 
+// game stuff
 
 function manyHairs(body, nHairs) {
   var hairs = Composite.create();
@@ -67,6 +73,7 @@ function oneHair(circle, hairOpts) {
     stiffness: 0.2,
     kinkiness: 0.0,
     overlap: 0.4,
+    opacity: 0,
   };
   Object.assign(opts, hairOpts);
   const group = getGroup();
@@ -93,7 +100,8 @@ function oneHair(circle, hairOpts) {
       slop: 0.3,
       render: {
         fillStyle: 'brown',
-        lineWidth: 0
+        lineWidth: 0,
+        opacity: opts.opacity,
       }
     })
   );
@@ -165,7 +173,7 @@ function moveGravity(ts) {
 
 // main
 
-var ground = Bodies.rectangle(350, 590, 800, 40, { isStatic: true });
+var ground = Bodies.rectangle(400, 590, 800, 40, { isStatic: true });
 World.add(world, ground);
 
 // add mouse control
@@ -198,9 +206,9 @@ function makeCuttable(hair) {
     });
 }
 
-// TODO attach hairs to this in a circle
+
 const crab = Bodies.circle(
-  350, 300, 80,
+  400, 300, 80,
   {
     frictionAir: 0.8,
     collisionFilter: { group: getGroup() },
@@ -241,7 +249,55 @@ render.mouse = mouse;
 // fit the render viewport to the scene
 Render.lookAt(render, {
   min: { x: 0, y: 0 },
-  max: { x: 700, y: 600 }
+  max: { x: 800, y: 600 }
 });
 
 moveGravity(Date.now());
+
+
+// title screen
+
+const DONT_COLLIDE = {
+  category: 0,
+  mask: 0
+};
+
+
+const titleScreen = Bodies.rectangle(
+  0, 0, WIDTH, HEIGHT,
+  {
+    collisionFilter: DONT_COLLIDE,
+    isStatic: true,
+    render: {
+      sprite: {
+        texture: 'img/title_screen.jpg',
+        xOffset: -0.5,
+        yOffset: -0.5,
+      }
+    }
+  }
+);
+
+World.add(world, titleScreen);
+
+
+const INITIAL_TIMESTAMP = performance.now();
+const LET_STAY_SECONDS = 3;
+const FADE_SECONDS = 2;
+
+
+function updateOpacities(ts) {
+  let elapsed = (ts - INITIAL_TIMESTAMP)/1000;
+  let hairsOpacity = Math.max(0, elapsed - LET_STAY_SECONDS) / FADE_SECONDS;
+  let titleOpacity = Math.max(0, 1 - hairsOpacity); // for some reason it goes negative sometimes, prevent this with Math.max
+  console.log(titleOpacity);
+  titleScreen.render.opacity = titleOpacity;
+  Composite.allBodies(hairs).forEach(
+    (body) => body.render.opacity = hairsOpacity
+  );
+  if (hairsOpacity < 1) {
+    window.requestAnimationFrame(updateOpacities);
+  }
+}
+
+window.requestAnimationFrame(updateOpacities);
