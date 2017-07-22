@@ -16,3 +16,42 @@
   font-size: 24pt;
   font-family: sans-serif;
 }
+
+#continue {
+  float: left;
+  position: absolute;
+  top: 300px;
+  left: 450px;
+  color: red;
+  max-width: 200px;
+  text-shadow: 5px 5px 5px #333333;
+  font-size: 40pt;
+  font-family: sans-serif;
+  text-decoration: blink;
+}
+
+
+.blink {
+    animation:1s blinker linear infinite;
+    -webkit-animation:1s blinker linear infinite;
+    -moz-animation:1s blinker linear infinite;
+    color: red;
+}
+
+@-moz-keyframes blinker {
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes blinker {
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}
+
+@keyframes blinker {
+    0% { opacity: 1.0; }
+    50% { opacity: 0.0; }
+    100% { opacity: 1.0; }
+}

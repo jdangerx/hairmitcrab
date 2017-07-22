@@ -353,10 +353,11 @@ function startFade() {
   // global variables lolllll
   InitialTimestamp = performance.now();
   window.requestAnimationFrame(updateOpacities);
-  render.canvas.removeEventListener("click", startFade);
+  document.querySelector("#continue").remove();
+  document.querySelector("body").removeEventListener("click", startFade);
 }
 
-render.canvas.addEventListener("click", startFade);
+document.querySelector("body").addEventListener("click", startFade);
 
 const FADE_SECONDS = 3;
 
