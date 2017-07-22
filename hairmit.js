@@ -90,11 +90,12 @@ function oneHair(circle, hairOpts) {
   var strand = Composites.stack(
     start.x,
     start.y,
-    opts.segmentsPerHair,
     1,
+    opts.segmentsPerHair,
+    0,
     -opts.length * opts.overlap,
-    0, (x, y) =>
-      Bodies.rectangle(x, y, opts.length, opts.width, {
+    (x, y) =>
+      Bodies.rectangle(x, y, opts.width, opts.length, {
       collisionFilter: { group },
       chamfer: 5,
       frictionAir: 1,
@@ -116,7 +117,7 @@ function oneHair(circle, hairOpts) {
     .forEach((pin, i) => pin.angularStiffness = Math.pow(0.90, i)) ;
   // attach segments to each other
   const distFromEnd = (1 - opts.overlap) / 2;
-  Composites.chain(strand, distFromEnd, 0, -distFromEnd, 0, {
+  Composites.chain(strand, 0, distFromEnd, 0, -distFromEnd, {
     label: "pin",
     length: 0,
     stiffness: 0.9,
