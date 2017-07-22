@@ -1,0 +1,7 @@
+canvas {
+    cursor: url(img/scissors-1.png), auto;
+}
+
+canvas:active {
+    cursor: url(img/scissors-2.png), auto;
+}
