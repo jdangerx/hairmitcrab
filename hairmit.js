@@ -44,9 +44,10 @@ Runner.run(runner, engine);
 function manyHairs(body, nHairs) {
   var hairs = Composite.create();
   const {color, shadow} = randColorAndShadow();
+  const width = 10 + 5 * Math.random() | 0;
   for (var i = 0; i < nHairs; i++) {
     const angle = -Math.PI/nHairs * (i+1.5) * 0.75;
-    Composite.add(hairs, oneHair(body, {angle, color, shadow}));
+    Composite.add(hairs, oneHair(body, {angle, color, shadow, width}));
   }
   return hairs;
 }
@@ -126,7 +127,6 @@ function oneHair(circle, hairOpts) {
     (x, y) =>
       Bodies.rectangle(x, y, opts.width, opts.length, {
       collisionFilter: { group },
-      chamfer: 5,
       frictionAir: 1,
       friction: 1,
       restitution: 0,
@@ -165,7 +165,7 @@ function oneHair(circle, hairOpts) {
     render: {
       anchors: false,
       type: "line",
-      lineWidth: 15,
+      lineWidth: opts.width,
       strokeStyle: opts.shadow,
     }
   });
@@ -178,7 +178,7 @@ function oneHair(circle, hairOpts) {
     render: {
       anchors: false,
       type: "line",
-      lineWidth: 12,
+      lineWidth: opts.width - 2,
       strokeStyle: opts.color,
     }
   });
@@ -285,7 +285,7 @@ function endGame() {
 }
 
 function evaluateScore() {
-  switch (SCORE / 5 | 0) {
+  switch (SCORE / 8 | 0) {
   case 0:
     return "Horrible! I'd hoped you'd do better with thumbs.";
   case 1:
