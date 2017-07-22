@@ -237,8 +237,7 @@ function updateTimer(ts) {
 
 function endGame() {
   document.getElementById("timer").className = "critical";
-  Events.off(mouseConstraint);
-  render.canvas.className = "";
+  cuttingToggle();
 }
 
 // main
@@ -276,6 +275,20 @@ function makeCuttable(hair) {
     });
 }
 
+function makeCuttingToggle(hairs) {
+  let cuttingOn = false;
+  return () => {
+    console.log(cuttingOn);
+    if (cuttingOn) {
+      Events.off(mouseConstraint);
+      render.canvas.className = "";
+    } else {
+      hairs.composites.forEach((hair) => makeCuttable(hair));
+      render.canvas.className = "scissorCursor";
+    }
+    cuttingOn = !cuttingOn;
+  };
+}
 
 const oceanBackground = Bodies.rectangle(
   0, 0, WIDTH, HEIGHT,
@@ -323,9 +336,6 @@ World.add(world, crab);
 function playSnip(){
   var audio = document.createElement("audio");
   audio.src = "snip.mp3";
-  audio.addEventListener("ended", function () {
-    document.removeChild(this);
-  }, false);
   audio.play();
 }
 
@@ -333,9 +343,9 @@ function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
   if (toDelete.length > 0) {
     incrementScore(1);
+    playSnip();
   }
   World.remove(parent, toDelete);
-  playSnip();
 }
 
 World.add(world, mouseConstraint);
@@ -398,11 +408,10 @@ function updateOpacities(ts) {
     // we need to wait to add the hairs til click now, since constraints don't have an opacity control
     var hairs = manyHairs(crab, 20);
     World.add(world, hairs);
+    cuttingToggle = makeCuttingToggle(hairs);
     HairExists = performance.now();
-    hairs.composites.forEach(makeCuttable);
     updateTimer(HairExists);
-    // activate scissor cursor
-    render.canvas.className += " scissorCursor";
+    cuttingToggle();
     incrementScore(0);
   } else {
     window.requestAnimationFrame(updateOpacities);
