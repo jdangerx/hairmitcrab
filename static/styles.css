@@ -27,9 +27,9 @@ div {
   left: 450px;
   color: red;
   max-width: 200px;
-  text-shadow: 5px 5px 5px #333333;
-  font-size: 40pt;
-  font-family: sans-serif;
+  text-shadow: 2px 2px 2px #333333;
+  font-size: 50pt;
+  font-family: VT323;
   text-decoration: blink;
 }
 
@@ -87,7 +87,9 @@ div {
   height: 160;
   top: 450;
   background: rgba(0, 0, 0, 0.9);
-  padding: 1em;
+  padding-top: 0.5em;
+  padding-left: 1em;
+  padding-right: 1em;
   box-sizing: border-box;
 }
 
