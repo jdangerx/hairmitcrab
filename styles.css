@@ -7,13 +7,13 @@
 }
 
 div {
+  float: left;
+  position: absolute;
   color: white;
   font-size: 24pt;
 }
 
 #scoreboard {
-  float: left;
-  position: absolute;
   top: 10px;
   left: 10px;
   text-shadow: 5px 5px 5px #333333;
@@ -21,8 +21,6 @@ div {
 }
 
 #continue {
-  float: left;
-  position: absolute;
   top: 300px;
   left: 450px;
   color: red;
@@ -60,8 +58,6 @@ div {
 }
 
 #timer {
-  float: left;
-  position: absolute;
   top: 10px;
   left: 500px;
   text-shadow: 5px 5px 5px #333333;
@@ -71,4 +67,16 @@ div {
 .critical {
   color: red;
   font-size: 36;
+}
+
+#crabSay {
+  font-family: fixed-width;
+  width: 800;
+  height: 150;
+  top: 450;
+  background-color: black;
+}
+
+.hidden {
+  display: none;
 }

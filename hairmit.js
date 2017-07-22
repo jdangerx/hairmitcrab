@@ -50,9 +50,6 @@ function manyHairs(body, nHairs) {
   return hairs;
 }
 
-// TODO where to put this
-world.gravity.scale = 0.08;
-
 const GROUPS =[
   Body.nextGroup(true),
   Body.nextGroup(true),
@@ -68,6 +65,7 @@ const GROUPS =[
 function getGroup() {
   return GROUPS[Math.random() * GROUPS.length | 0];
 }
+
 function oneHair(circle, hairOpts) {
   var opts = {
     length: 30,
@@ -170,7 +168,6 @@ function project(point, angle, length){
   };
 }
 
-
 function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
   const pointA = {
     x: radiusOffset * host.circleRadius * Math.cos(pinAngle),
@@ -191,6 +188,7 @@ function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
   var pin = project(pointA, pinAngle, pinDist);
 }
 
+world.gravity.scale = 0.08;
 function moveGravity(ts) {
   world.gravity.x =
     0.3 * world.gravity.scale * Math.sin(ts / 2000);
@@ -211,6 +209,17 @@ function incrementScore(inc) {
     exclamations = exclamations + "!";
   }
   scoreboard.innerHTML = "SCORE: " + SCORE + exclamations;
+}
+
+function crabSay(dialogue) {
+  cuttingToggle("off");
+  var dialogueBox = document.getElementById("crabSay");
+  dialogueBox.className = "";
+  dialogueBox.innerHTML = dialogue;
+  dialogueBox.onclick = () => {
+    dialogueBox.className = "hidden";
+    cuttingToggle("on");
+  }
 }
 
 function updateTimer(ts) {
@@ -237,7 +246,7 @@ function updateTimer(ts) {
 
 function endGame() {
   document.getElementById("timer").className = "critical";
-  cuttingToggle();
+  cuttingToggle("off");
 }
 
 // main
@@ -276,17 +285,14 @@ function makeCuttable(hair) {
 }
 
 function makeCuttingToggle(hairs) {
-  let cuttingOn = false;
-  return () => {
-    console.log(cuttingOn);
-    if (cuttingOn) {
+  return (newState) => {
+    if (newState !== "on") {
       Events.off(mouseConstraint);
       render.canvas.className = "";
     } else {
       hairs.composites.forEach((hair) => makeCuttable(hair));
       render.canvas.className = "scissorCursor";
     }
-    cuttingOn = !cuttingOn;
   };
 }
 
@@ -411,7 +417,7 @@ function updateOpacities(ts) {
     cuttingToggle = makeCuttingToggle(hairs);
     HairExists = performance.now();
     updateTimer(HairExists);
-    cuttingToggle();
+    cuttingToggle("on");
     incrementScore(0);
   } else {
     window.requestAnimationFrame(updateOpacities);
