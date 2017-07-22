@@ -385,6 +385,8 @@ function greet() {
     ]
   );
 
+  playMBTI(mbti);
+
   return "Hi, my name is " + firstName + " " + lastName + " and I'm an " + mbti + ". Can you make me look like " + celeb + "?";
 }
 
@@ -483,6 +485,13 @@ function playSnip(){
   audio.src = "static/snip.mp3";
   audio.play();
 }
+
+function playMBTI(mbtiType){
+  var audio = document.createElement("audio");
+  audio.src = `static/mbti/${mbtiType}.mp4`;
+  audio.play();
+}
+
 
 function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
