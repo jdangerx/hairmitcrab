@@ -72,8 +72,8 @@ function oneHair(circle, hairOpts) {
     angularStiffness: 0.95,
     stiffness: 0.2,
     kinkiness: 0.0,
-    overlap: 0.4,
-    opacity: 0,
+    overlap: 0.6,
+    opacity: 0
   };
   Object.assign(opts, hairOpts);
   const group = getGroup();
@@ -99,9 +99,7 @@ function oneHair(circle, hairOpts) {
       restitution: 0,
       slop: 0.3,
       render: {
-        fillStyle: 'brown',
-        lineWidth: 0,
-        opacity: opts.opacity,
+        visible: false
       }
     })
   );
@@ -114,13 +112,41 @@ function oneHair(circle, hairOpts) {
     .filter(({label}) => label === "pin")
     .forEach((pin, i) => pin.angularStiffness = Math.pow(0.90, i)) ;
   // attach segments to each other
-  Composites.chain(strand, 0.3, 0, -0.3, 0, {
+  const distFromEnd = (1 - opts.overlap) / 2;
+  Composites.chain(strand, distFromEnd, 0, -distFromEnd, 0, {
     label: "pin",
     length: 0,
     stiffness: 0.9,
     angularStiffness: opts.angularStiffness,
     render: {
       visible: false
+    }
+  });
+
+  // actually display
+  Composites.chain(strand, 0, 0, 0, 0, {
+    label: "pin",
+    length: opts.length * (1 - opts.overlap),
+    stiffness: 0.0,
+    angularStiffness: opts.angularStiffness,
+    render: {
+      anchors: false,
+      type: "line",
+      lineWidth: 15,
+      strokeStyle: "#442200",
+    }
+  });
+
+  Composites.chain(strand, 0, 0, 0, 0, {
+    label: "pin",
+    length: opts.length * (1 - opts.overlap),
+    stiffness: 0.0,
+    angularStiffness: opts.angularStiffness,
+    render: {
+      anchors: false,
+      type: "line",
+      lineWidth: 12,
+      strokeStyle: "#663300",
     }
   });
   // fix the first one
@@ -175,6 +201,7 @@ function moveGravity(ts) {
 
 var ground = Bodies.rectangle(400, 590, 800, 40, { isStatic: true });
 World.add(world, ground);
+render.context.lineCap = "round";
 
 // add mouse control
 var mouse = Mouse.create(render.canvas);
