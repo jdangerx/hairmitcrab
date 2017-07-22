@@ -16,6 +16,8 @@ var Engine = Matter.Engine,
 var engine = Engine.create({ constraintIterations: 1, positionIterations: 2, velocityIterations: 2 }),
     world = engine.world;
 
+var SCORE = 0;
+
 const WIDTH = 800;
 const HEIGHT = 600;
 
@@ -128,8 +130,8 @@ function oneHair(circle, hairOpts) {
   });
 
   // actually display
-  Composites.chain(strand, 0, 0, 0, 0, {
-    label: "pin",
+  Composites.chain(strand, 0, -0.4, 0, -0.4, {
+    label: "hair",
     length: opts.length * (1 - opts.overlap),
     stiffness: 0.0,
     angularStiffness: opts.angularStiffness,
@@ -141,8 +143,8 @@ function oneHair(circle, hairOpts) {
     }
   });
 
-  Composites.chain(strand, 0, 0, 0, 0, {
-    label: "pin",
+  Composites.chain(strand, 0, -0.4, 0, -0.4, {
+    label: "hair",
     length: opts.length * (1 - opts.overlap),
     stiffness: 0.0,
     angularStiffness: opts.angularStiffness,
@@ -199,6 +201,16 @@ function moveGravity(ts) {
       {
         moveGravity(ts);
       });
+}
+
+function incrementScore(inc) {
+  const scoreboard = document.getElementById("scoreboard");
+  SCORE = SCORE + inc;
+  var exclamations = "";
+  for (i = 0; i < (SCORE - 5) / 5; i++) {
+    exclamations = exclamations + "!";
+  }
+  scoreboard.innerHTML = "SCORE: " + SCORE + exclamations;
 }
 
 // main
@@ -291,6 +303,9 @@ function playSnip(){
 
 function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
+  if (toDelete.length > 0) {
+    incrementScore(1);
+  }
   World.remove(parent, toDelete);
   playSnip();
 }
@@ -357,7 +372,7 @@ function updateOpacities(ts) {
     hairs.composites.forEach(makeCuttable);
     // activate scissor cursor
     render.canvas.className += " scissorCursor";
-    // TODO
+    incrementScore(0);
   } else {
     window.requestAnimationFrame(updateOpacities);
   }
