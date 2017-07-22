@@ -245,7 +245,7 @@ const oceanBackground = Bodies.rectangle(
     restitution: 0,
     render: {
       sprite: {
-        texture: 'https://ak2.picdn.net/shutterstock/videos/896608/thumb/1.jpg?i10c=img.resize(height:160)',
+        texture: 'img/ocean.jpg',
         yScale: 1.5,
         xOffset: -0.5,
         yOffset: -0.5,
