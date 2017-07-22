@@ -61,9 +61,9 @@ function getGroup() {
 function oneHair(circle, hairOpts) {
   var opts = {
     length: 30,
-    width: 15,
+    width: 10,
     angle: Math.PI,
-    segmentsPerHair: 5,
+    segmentsPerHair: 10,
     angularStiffness: 0.95,
     stiffness: 0.2,
     kinkiness: 0.0,
@@ -89,7 +89,6 @@ function oneHair(circle, hairOpts) {
       collisionFilter: { group },
       frictionAir: 0.05,
       frictionStatic: 5,
-      chamfer: 5,
       render: {
         fillStyle: 'brown',
         lineWidth: 0
@@ -148,18 +147,6 @@ function fix(host, composite, body, pinAngle, pinDist, radiusOffset) {
   }));
 
   var pin = project(pointA, pinAngle, pinDist);
-
-  // Composite.add(composite, Constraint.create({
-  //   bodyA: host,
-  //   bodyB: body,
-  //   pointA: pin,
-  //   pointB: { x: -pinDist, y: 0 },
-  //   stiffness: 1,
-  //   length: 0,
-  //   render: {
-  //     visible: false
-  //   }
-  // }));
 }
 
 function moveGravity(ts) {
@@ -187,7 +174,7 @@ var mouseConstraint = MouseConstraint.create(engine, {
   constraint: {
     stiffness: 0.5,
     render: {
-      // visible: false
+      visible: false
     }
   }
 });
@@ -222,7 +209,7 @@ const crab = Bodies.circle(
         xScale: 0.3,
         yScale: 0.3,
         xOffset: -0.03,
-        yOffset: 0.08,
+        yOffset: 0.08
       }
     }
   });
@@ -239,7 +226,7 @@ hairs.composites.forEach(makeCuttable);
 
 function cutAbove(parent, body) {
   var toDelete = parent.constraints.filter((c) => c.bodyB === body);
-  // World.remove(parent, toDelete);
+  World.remove(parent, toDelete);
 }
 
 World.add(world, mouseConstraint);
@@ -253,4 +240,4 @@ Render.lookAt(render, {
   max: { x: 700, y: 600 }
 });
 
-// moveGravity(Date.now());
+moveGravity(Date.now());
