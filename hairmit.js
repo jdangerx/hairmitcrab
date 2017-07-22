@@ -265,6 +265,9 @@ function setupTimer() {
   let fullBar = document.getElementById("greenBar");
   ctx.drawImage(emptyBar, 0, 0);
   ctx.drawImage(fullBar, 0, 0);
+
+  // removing hidden
+  document.getElementById("timeText").className = "";
 }
 
 function updateTimer(ts) {
