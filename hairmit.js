@@ -268,8 +268,8 @@ function setupTimer() {
 }
 
 function updateTimer(ts) {
-  let maxTime = 10;
-  let remaining = maxTime - (ts - HairExists)/1000 | 0;
+  let maxTime = 10.0;
+  let remaining = maxTime - (ts - HairExists)/1000.0;
   let timer = document.getElementById("timer");
   let ctx = timer.getContext("2d");
   let fractionRemaining = remaining / maxTime;
